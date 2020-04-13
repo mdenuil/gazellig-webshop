@@ -1,0 +1,13 @@
+.container {
+	display: flex;
+	align-items: center;
+}
+
+p, .spinner-container {
+    display: inline-block;
+}
+
+p {
+	font-size: larger;
+	margin-left: 10px;
+}

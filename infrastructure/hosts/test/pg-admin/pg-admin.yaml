@@ -1,0 +1,73 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: pg-admin
+  namespace: gazellig-test
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: pg-admin
+      labels:
+        name: pg-admin
+    spec:
+      containers:
+      - image: dpage/pgadmin4
+        name: pg-admin
+        env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            value: admin@gazellig.nl
+          - name: PGADMIN_DEFAULT_PASSWORD
+            value: Geheim_101
+          - name: PGADMIN_LISTEN_ADDRESS
+            value: "0.0.0.0"
+          - name: PGADMIN_LISTEN_PORT
+            value: "5050"
+        ports:
+          - name: pgadminport
+            containerPort: 5050
+        resources:     
+          requests:
+            cpu: 40m
+            memory: 50Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-admin
+  namespace: gazellig-test
+  labels:
+    name: pg-admin
+spec:
+  selector:
+    name: pg-admin
+  ports:
+    - name: pgadminport
+      protocol: TCP
+      port: 80
+      targetPort: 5050
+
+---
+  
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: pg-admin
+  namespace: gazellig-test
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - host: pgadmin-test.gazellig.nl
+      http:
+        paths:
+        - path: /(.*)
+          backend:
+            serviceName: pg-admin
+            servicePort: 80

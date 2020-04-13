@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<analysis xmlns="https://jeremylong.github.io/DependencyCheck/dependency-check.1.6.xsd">
+    <scanInfo>
+        <engineVersion>3.0.2</engineVersion>        
+    </scanInfo>
+    <projectInfo>
+        <name>Example pipeline Angular</name>        
+        <reportDate>{reportdate}</reportDate>
+        <credits>This report contains data retrieved from the National Vulnerability Database: https://nvd.nist.gov and from the Node Security Platform: https://nodesecurity.io</credits>
+    </projectInfo>
+    <dependencies>
+        {dependencies}    
+    </dependencies>
+</analysis>

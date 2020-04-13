@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds-magazijn
+  namespace: gazellig-prod
+spec:
+  selector:
+    matchLabels:
+      name: ds-magazijn
+  template:
+    metadata:
+      labels:
+        name: ds-magazijn
+    spec:
+      containers:
+        - name: ds-magazijn
+          image: minor2019.azurecr.io/kantilever-magazijn:1.0
+          env:
+          - name: eventbus-hostname
+            value: rabbitmq
+          - name: eventbus-port
+            value: "5672"
+          - name: eventbus-username
+            value: Kantilever
+          - name: eventbus-password
+            value: Kantilever
+          - name: MagazijnDbConnection
+            value: Host=postgresdatabase;Port=5432;Database=MagazijnDb;Username=postgres;Password=Geheim_101
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+          - containerPort: 80
+            name: http
+      imagePullSecrets:
+        - name: minor2019
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-magazijn
+  namespace: gazellig-prod
+spec:
+  selector:
+    name: ds-magazijn
+  ports:
+  - name: http
+    protocol: TCP
+    port: 2021
+    targetPort: 80

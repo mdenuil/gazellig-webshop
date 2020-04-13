@@ -1,0 +1,95 @@
+@import "~@angular/material/theming";
+@import '../../../../custom-theme.scss';
+
+#info-container {
+    width: 200px;
+    margin: 25px;
+    margin-top: 0;
+    padding: 10px;
+    background-color: #e6e7f1;
+    border-radius: 0 0 4px 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+#info-container button {
+	margin-top: 14px;
+    margin-bottom: 20px;
+}
+
+#image-container {
+	height: 200px;
+	margin: 25px;
+	margin-bottom: -5px;
+	background-color: #e6e7f1;
+	cursor: pointer;
+}
+
+#image {
+	width: 220px;
+	max-height: 200px;
+	border-radius: 4px 4px 0 0;
+	background-color: white;
+}
+
+#name {
+	height: 2em;
+	margin: 0;
+	font-size: large;
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+}
+
+#item-info {
+	display: flex;
+	cursor: pointer;
+}
+
+#spacer {
+	flex: 1;
+}
+
+#stock {
+	font-size: larger;
+	margin-top: 5px;
+	align-self: center;
+}
+
+#price {
+	font-size: larger;
+	margin-top: 5px;
+	align-self: center;
+}
+
+mat-icon {
+	font-size: 100% !important;
+}
+
+mat-icon:hover {
+	cursor: pointer;
+}
+
+input {
+	text-align: center;
+	color: black !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+#cart-info mat-form-field {
+	width: 33%;
+}
+
+#cart-info button {
+	width: 60%;
+    margin-left: 10px;
+}

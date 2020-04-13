@@ -1,0 +1,19 @@
+<article *ngIf="besteldArtikel">
+	<div id="image">
+		<img src="./assets/product/{{ besteldArtikel.artikel.afbeeldingUrl }}" alt="Product image" />
+	</div>
+	<div id="data">
+		<div id="item-info">
+			<p id="name">{{ besteldArtikel.artikel.naam }}</p>
+			<mat-icon (click)="delete()">delete_forever</mat-icon>
+		</div>
+		<div id="price-info">
+			<mat-form-field>
+				<mat-icon matPrefix (click)="subtractAmount()">remove</mat-icon>
+				<input type="number" disabled min="1" matInput [(value)]="besteldArtikel.aantal">
+				<mat-icon matSuffix (click)="addAmount()">add</mat-icon>
+			</mat-form-field>
+			<p id="price">{{ besteldArtikel.artikel.prijs | currency: 'EUR' }}</p>
+		</div>
+	</div>
+</article>

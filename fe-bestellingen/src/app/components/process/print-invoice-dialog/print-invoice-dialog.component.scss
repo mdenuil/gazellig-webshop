@@ -1,0 +1,45 @@
+img {
+    width: 200px;
+}
+
+mat-grid-tile {
+	text-align: left;
+}
+
+h1, h2 {
+    text-align: left;
+    width: 100%;
+}
+
+#invoice-info {
+	width: 50%;
+	display: inline-block;
+}
+
+#invoice-info p {
+	margin: 0;
+    width: 100%;
+	text-align: left;
+	font-size: 18px;
+}
+
+#invoice-info em {
+    display: inline-block;
+}
+
+.wrapper-full-width {
+	width: 100%;
+}
+
+#actions {
+	margin-top: 50px;
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+#actions button {
+	margin: 0 50px;
+    padding: 20px;
+    font-size: xx-large;
+}

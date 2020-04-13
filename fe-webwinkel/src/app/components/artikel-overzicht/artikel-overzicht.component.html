@@ -1,0 +1,11 @@
+<img id="banner" src="./assets/banner.png" alt="Banner">
+
+<main>
+	<app-search (searchInput)="getArtikelen($event)"></app-search>
+	<mat-spinner id="spinner" [diameter]="50" *ngIf="loading; else overzicht"></mat-spinner>	
+	<ng-template #overzicht>
+		<section>
+			<app-artikel *ngFor="let artikel of artikelen" [artikel]="artikel"></app-artikel>
+		</section>
+	</ng-template>
+</main>

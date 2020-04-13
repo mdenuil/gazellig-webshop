@@ -1,0 +1,24 @@
+@import "~@angular/material/theming";
+@import '../../../custom-theme.scss';
+
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 200px;
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+#title {
+	margin-left: 25px;
+}

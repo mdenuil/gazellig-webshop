@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe-bestellingen
+  namespace: gazellig-test
+spec:
+  selector:
+    matchLabels:
+      name: fe-bestellingen
+  template:
+    metadata:
+      labels:
+        name: fe-bestellingen
+    spec:
+      containers:
+        - name: fe-bestellingen
+          image: **/gazellig/fe-bestellingen:develop-6
+          livenessProbe:
+            httpGet:
+              port: 4200
+              path: /
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 4200
+              path: /
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "30m"
+            limits:
+              memory: "150Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 4200
+      imagePullSecrets:
+        - name: **
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-bestellingen
+  namespace: gazellig-test
+spec:
+  selector:
+    name: fe-bestellingen
+  ports:
+    - protocol: TCP
+      port: 4200
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: fe-bestellingen
+  namespace: gazellig-test
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /gazellig-fe-bestellingen/test(/|$)(.*)
+            backend:
+              serviceName: fe-bestellingen
+              servicePort: 4200

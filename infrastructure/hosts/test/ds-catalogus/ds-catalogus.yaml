@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds-catalogus
+  namespace: gazellig-test
+spec:
+  selector:
+    matchLabels:
+      name: ds-catalogus
+  template:
+    metadata:
+      labels:
+        name: ds-catalogus
+    spec:
+      containers:
+        - name: ds-catalogus
+          image: minor2019.azurecr.io/kantilever-catalogus:1.0
+          env:
+          - name: eventbus-hostname
+            value: rabbitmq
+          - name: eventbus-port
+            value: "5672"
+          - name: eventbus-username
+            value: Kantilever
+          - name: eventbus-password
+            value: Kantilever
+          - name: CatalogusDbConnection
+            value: Host=postgresdatabase;Port=5432;Database=CatalogusDb;Username=postgres;Password=Geheim_101
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+          - containerPort: 80
+            name: http
+      imagePullSecrets:
+        - name: minor2019
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-catalogus
+  namespace: gazellig-test
+spec:
+  selector:
+    name: ds-catalogus
+  ports:
+  - name: http
+    protocol: TCP
+    port: 2020
+    targetPort: 80

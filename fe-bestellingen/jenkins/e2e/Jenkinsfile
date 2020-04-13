@@ -1,0 +1,70 @@
+pipeline {
+    // In order to make the 'Build-Finished' Gitlab phase work, we need an agent.
+    agent { label 'master' }
+
+    parameters {
+        choice(name: 'PHASE', choices: "test\nprod", description: "Is the host for 'test' or for 'production'?")
+    }
+
+    options {
+        // Use the GitLab connection named 'gitlab-connection', available in Endeavour Jenkins buildservers
+        gitLabConnection("gitlab-connection")
+        gitlabBuilds(builds: ['Build-Finished'])
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // No concurrent builds of this branch
+        disableConcurrentBuilds()
+        // No resume on Jenkins start
+        disableResume()
+    }
+
+    environment {
+        DOCKER_REGISTRY = "**"
+    }
+
+    // Update commitstatus to Gitlab to enable auto-merging of the build in case of success
+    post {
+        success {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'failed'
+        }
+        always {
+            cleanWs()
+        }
+    }
+
+    stages {
+        stage('Node') {
+            agent {
+                docker {
+                    image '**/gazellig/node-chromeheadless:latest'
+                }
+            }
+            stages {
+                stage('Setup') {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            sh "npm install"
+                        }
+                    }
+                }
+
+                stage('Test e2e') {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                if (PHASE == "test") {
+                                    sh "npm run e2e:test"
+                                } else if (PHASE == "prod") {
+                                    sh "npm run e2e"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

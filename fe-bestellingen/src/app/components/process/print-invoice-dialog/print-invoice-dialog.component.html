@@ -1,0 +1,46 @@
+<div id="invoice" mat-dialog-content>
+	<mat-grid-list cols="3" rowHeight="50px">
+		<mat-grid-tile [colspan]="1" [rowspan]="2">
+			<img src="assets/logo.png" alt="Kantilever logo">
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="2" [rowspan]="1">
+			<h1>Invoice</h1>
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="2" [rowspan]="1">
+			<h1>Order: {{ data.bestelNummer }}</h1>
+		</mat-grid-tile>
+	</mat-grid-list>
+
+	<mat-grid-list id="invoice-info" cols="1" rowHeight="60px">
+		<mat-grid-tile [colspan]="1" [rowspan]="1">
+			<h2>Contact information</h2>
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="1" [rowspan]="1">
+			<div class="wrapper-full-width">
+				<p>{{ data.klantGegevens.initialen }} {{ data.klantGegevens.achternaam }}</p>
+				<p>{{ data.factuurAdres.straatnaam }} {{ data.factuurAdres.huisnummer }},
+					{{ data.factuurAdres.postcode }}
+				</p>
+				<p>{{ data.factuurAdres.woonplaats }}</p>
+			</div>
+		</mat-grid-tile>
+	</mat-grid-list>
+
+	<mat-grid-list id="invoice-info" cols="1" rowHeight="60px">
+		<mat-grid-tile [colspan]="1" [rowspan]="1">
+			<h2>Payment information</h2>
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="1" [rowspan]="1">
+			<div class="wrapper-full-width">
+				<p>Total amount: {{ price | currency: "EUR" }}</p>
+				<p>Please make your payment within 14 days of receipt to <em>NL44 INGB 00058 54051</em></p>
+			</div>
+		</mat-grid-tile>
+	</mat-grid-list>
+</div>
+<div id="actions" mat-dialog-actions>
+	<button mat-raised-button color="accent" printTitle="Kantilever order {{ data.bestelNummer }}"
+		[useExistingCss]="true" printSectionId="invoice" ngxPrint (click)="print()">
+		Factuur printen
+	</button>
+</div>

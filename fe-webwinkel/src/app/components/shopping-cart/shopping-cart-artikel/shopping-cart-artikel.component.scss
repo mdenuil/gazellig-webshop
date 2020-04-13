@@ -1,0 +1,95 @@
+@import "~@angular/material/theming";
+@import '../../../../custom-theme.scss';
+
+article {
+	display: flex;
+	margin-bottom: 5px;
+	background-color: mat-color($primary, 50);
+	border-radius: 4px;
+}
+
+#image {
+	min-width: 162px;
+    max-height: 100px;
+}
+
+img {
+	height: 100%;
+	border-radius: 4px;
+    background-color: white;
+}
+
+#data {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+    flex-grow: 1;
+}
+
+#name {
+	align-self: flex-start;
+}
+
+#item-info p {
+	display: inline-block;
+}
+
+#item-info mat-icon {
+	float: right;
+	margin: 5px;
+	margin-right: 10px;
+}
+
+#price-info {
+	display: flex;
+	align-items: center;
+	flex-direction: row-reverse;
+    padding-right: 10px;
+}
+
+#price-info mat-icon {
+	font-size: 100% !important;
+}
+
+#data p {
+	margin: 5px;
+	font-size: larger;
+}
+
+#price {
+	order: -1;
+	margin-left: 15px !important;
+}
+
+input {
+	text-align: center;
+	color: black !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+mat-form-field {
+	width: 70px;
+}
+
+mat-icon:hover {
+	cursor: pointer;
+}
+
+@media screen and (max-width: 540px) {
+	article {
+		flex-direction: column;
+	}
+
+	img {
+		width: 50%;
+	}
+}

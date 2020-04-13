@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: gazellig-test
+spec:
+  selector:
+    matchLabels:
+      name: rabbitmq
+  template:
+    metadata:
+      labels:
+        name: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3-management
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: Kantilever
+        - name: RABBITMQ_DEFAULT_PASS
+          value: Kantilever
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "30m"
+          limits:
+            memory: "512Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 5672
+          name: amqp
+        - containerPort: 15672
+          name: http
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: gazellig-test
+spec:
+  selector:
+    name: rabbitmq
+  ports:
+  - name: http
+    protocol: TCP
+    port: 15672
+    targetPort: 15672
+  - name: amqp
+    protocol: TCP
+    port: 5672
+    targetPort: 5672
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: rabbitmq
+  namespace: gazellig-test
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: rabbitmq-test.gazellig.nl
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: rabbitmq
+          servicePort: 15672

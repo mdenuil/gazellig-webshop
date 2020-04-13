@@ -1,0 +1,81 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body {
+	height: auto;
+}
+
+body {
+	margin: 50px;
+	font-family: Calibri, sans-serif;
+	background-color: #AAB1E4;
+}
+
+main {
+    margin-left: 150px;
+    margin-right: 150px;
+}
+
+mat-card {
+	margin: 25px;
+}
+
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+@import 'custom-theme.scss';
+
+.my-theme {
+	@include angular-material-theme($custom-theme);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: #2d398e;
+}
+
+h1 {
+	font-size: 200% !important;
+}
+
+h2 {
+	font-size: 180% !important;
+}
+
+h3 {
+	font-size: 160% !important;
+}
+
+h4 {
+	font-size: 140% !important;
+}
+
+h5 {
+	font-size: 120% !important;
+}
+
+h6 {
+	font-size: 100% !important;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: mat-color($primary, lighter);
+}
+
+@media screen and (max-width: 670px) {
+	main {
+		margin-left: 50px;
+		margin-right: 50px;
+	}
+}
+
+@media screen and (max-width: 425px) {
+	main {
+		margin-left: 5px;
+		margin-right: 5px;
+	}
+}

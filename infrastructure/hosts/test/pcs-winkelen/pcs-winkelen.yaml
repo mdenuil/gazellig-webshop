@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcs-winkelen
+  namespace: gazellig-test
+spec:
+  selector:
+    matchLabels:
+      name: pcs-winkelen
+  template:
+    metadata:
+      labels:
+        name: pcs-winkelen
+    spec:
+      containers:
+        - name: pcs-winkelen
+          image: **/gazellig/microservice-pcs-winkelen:develop-7
+          env:
+          - name: RABBITMQ_HOST
+            value: rabbitmq
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_USERNAME
+            value: Kantilever
+          - name: RABBITMQ_PASSWORD
+            value: Kantilever
+          - name: EVENT_EXCHANGE
+            value: Kantilever.Eventbus
+          - name: REPLAY_EXCHANGE
+            value: Kantilever.Replay.Bestellen
+          - name: DATASOURCE_URL
+            value: postgresql://postgresdatabase:5432
+          - name: DATASOURCE_NAME
+            value: pcswinkelendb
+          - name: DATASOURCE_USERNAME
+            value: postgres
+          - name: DATASOURCE_PASSWORD
+            value: Geheim_101
+          - name: AUDITLOG_URL
+            value: http://miffy-auditlog
+          - name: AUDITLOG_PORT
+            value: "2022"
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+          readinessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+      #     volumeMounts:
+      #       - name: storage-logs-gateway
+      #         mountPath: /logs
+      # volumes:
+      #   - name: storage-logs-gateway
+      #     persistentVolumeClaim:
+      #       claimName: storage-logs-gateway
+
+      imagePullSecrets:
+        - name: **
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcs-winkelen
+  namespace: gazellig-test
+spec:
+  selector:
+    name: pcs-winkelen
+  ports:
+    - protocol: TCP
+      port: 8080
+
+# --- 
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: storage-logs-bff-webwinkel
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 256Mi

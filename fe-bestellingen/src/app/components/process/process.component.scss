@@ -1,0 +1,13 @@
+#actions {
+	margin-top: 50px;
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+#actions button {
+	margin: 0 50px;
+    padding: 20px;
+    font-size: xx-large;
+    flex-grow: 1;
+}

@@ -1,0 +1,46 @@
+img {
+    width: 200px;
+}
+
+mat-grid-tile {
+	text-align: left;
+}
+
+h1, h2 {
+    text-align: left;
+    width: 100%;
+}
+
+table {
+	margin-top: 25px;
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td, th {
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
+}
+
+tr:nth-child(even) {
+	background-color: #dddddd;
+	outline: none;
+	color-adjust: exact;
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
+}
+
+#actions {
+	margin-top: 50px;
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+#actions button {
+	margin: 0 50px;
+    padding: 20px;
+    font-size: xx-large;
+}

@@ -1,0 +1,36 @@
+<main>
+	<p id="noProducts" *ngIf="besteldeArtikelen.length === 0">
+		There are no products in the shopping cart. You can add home on the <a routerLink="/">home page</a>.
+	</p>
+
+	<div *ngIf="besteldeArtikelen.length > 0">
+		<div id="items">
+			<section id="articles">
+				<app-shopping-cart-artikel 
+					*ngFor="let artikel of besteldeArtikelen" 
+					[besteldArtikel]="artikel">
+				</app-shopping-cart-artikel>
+			</section>
+
+			<section id="totals">
+				<table>
+					<tr id="total">
+						<td>Total amount</td>
+						<td>{{ totalAmount | currency:'EUR' }}</td>
+					</tr>
+					<tr id="totalWithoutVAT">
+						<td>Without VAT</td>
+						<td>{{ totalAmountWithoutVAT | currency:'EUR' }}</td>
+					</tr>
+				</table>
+			</section>
+		</div>
+
+		<section id="form" *ngIf="isLoggedIn">
+			<app-shopping-cart-form></app-shopping-cart-form>
+		</section>
+		<section id="login" *ngIf="!isLoggedIn">
+			<app-login [successRedirectUrl]="shoppingCartUrl"></app-login>
+		</section>
+	</div>
+</main>

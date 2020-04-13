@@ -1,0 +1,48 @@
+<mat-icon id="close" (click)="close()">clear</mat-icon>
+
+<div id="main">
+	<div id="image-container">
+		<img id="image" src="./assets/product/{{artikel.afbeeldingUrl}}" alt="Article image">
+	</div>
+	<div id="content">
+		<p id="naam">{{ artikel.naam }}</p>
+		<p id="prijs">{{ artikel.prijs | currency: 'EUR'}}</p>
+		<p id="aantal">{{ artikel.aantal | inStock }} In stock</p>
+
+		<div id="cart-info" *ngIf="!inCart">
+			<mat-form-field>
+				<mat-icon matPrefix (click)="subtractAmount()">remove</mat-icon>
+				<input type="number" disabled min="1" matInput [(value)]="besteldArtikel.aantal">
+				<mat-icon matSuffix (click)="addAmount()">add</mat-icon>
+			</mat-form-field>
+			<button (click)="addToCart()" mat-raised-button color="primary">
+				Order now
+			</button>
+		</div>
+
+		<button *ngIf="inCart" routerLink="/shopping-cart" mat-raised-button color="accent" (click)="close()">
+			In shopping cart
+		</button>
+	</div>
+</div>
+
+<div id="secondary">
+	<table>
+		<tr *ngIf="artikel.beschrijving">
+			<td>Description</td>
+			<td>{{ artikel.beschrijving }}</td>
+		</tr>
+		<tr *ngIf="artikel.leverancier">
+			<td>Supplier</td>
+			<td>{{ artikel.leverancier }}</td>
+		</tr>
+		<tr *ngIf="artikel.leverancierCode">
+			<td>Supplier code</td>
+			<td>{{ artikel.leverancierCode }}</td>
+		</tr>
+		<tr *ngIf="artikel.categorieen && artikel.categorieen.length > 0">
+			<td>Categories</td>
+			<td>{{ artikel.categorieen.join(", ") }}</td>
+		</tr>
+	</table>
+</div>

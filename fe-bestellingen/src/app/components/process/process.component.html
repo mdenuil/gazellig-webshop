@@ -1,0 +1,23 @@
+<div *ngIf="bestelling else showMessage">
+	<h1>Bestelling: {{ bestelling.bestelNummer }}</h1>
+	<h2>Artikelen</h2>
+	<app-artikel-list [artikelen]=" bestelling.artikelen" (isCompleted)="itemsCompleted = true"
+		(artikelChecked)="setArtikelChecked($event)">
+	</app-artikel-list>
+
+	<div id="actions">
+		<button mat-raised-button color="accent" [disabled]="!itemsCompleted" (click)="openPrintInvoiceDialog()">
+			Factuur genereren
+		</button>
+		<button mat-raised-button color="accent" [disabled]="!invoicePrinted" (click)="openPrintPakbonDialog()">
+			Pakbon genereren
+		</button>
+		<button mat-raised-button color="accent"
+			[disabled]="finishBestellingLoading || !(invoicePrinted && pakbonPrinted)" (click)="finishBestelling()">
+			Bestelling afronden
+		</button>
+	</div>
+</div>
+<ng-template #showMessage>
+	<h1>Er is op dit moment geen bestelling. Kom later terug.</h1>
+</ng-template>

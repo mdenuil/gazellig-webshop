@@ -1,0 +1,26 @@
+<main>
+	<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+		<mat-form-field>
+			<input type="email" matInput placeholder="Email" formControlName="email" required />
+			<mat-error *ngIf="f.email.errors?.required">
+				This field is required
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field>
+			<input type="password" matInput placeholder="Password" formControlName="wachtwoord" required />
+			<mat-error *ngIf="f.wachtwoord.errors?.required">
+				This field is required
+			</mat-error>
+		</mat-form-field>
+
+		<button mat-raised-button color="primary" [disabled]="loginForm.invalid || loading">
+			Log in
+			<mat-spinner [diameter]="18" *ngIf="loading"></mat-spinner>
+		</button>
+	</form>
+	<div id="register-button">
+		<button mat-stroked-button color="secondary" [routerLink]="['/register']">
+			No account? Register here.
+		</button>
+	</div>
+</main>

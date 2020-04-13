@@ -1,0 +1,50 @@
+pipeline {
+    agent none
+
+    parameters {
+        choice(name: 'PHASE', choices: "test\nprod", description: "Is the host for 'test' or for 'production'?")
+    }
+
+    options {
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // No concurrent builds of this branch
+        disableConcurrentBuilds()
+        // No resume on Jenkins start
+        disableResume()
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+
+    stages {
+        stage('Run e2e tests') {
+            parallel {
+                stage("E2E test fe-webwinkel Azure environment") {
+                    /********************************
+                    * Trigger job to E2e fe-webwinkel Azure environment *
+                    ********************************/
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            build job: "gazellig-e2e-testing-webwinkel", parameters: [string(name: 'PHASE', value: PHASE)]
+                        }
+                    }
+                }
+
+                stage("E2E test fe-bestellingen Azure environment") {
+                    /********************************
+                    * Trigger job to E2e fe-bestellingen Azure environment *
+                    ********************************/
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            build job: "gazellig-e2e-testing-bestellingen", parameters: [string(name: 'PHASE', value: PHASE)]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,33 @@
+<table mat-table [dataSource]="dataSource">
+
+	<!-- Checkbox Column -->
+	<ng-container matColumnDef="select">
+		<th mat-header-cell *matHeaderCellDef> Verzameld </th>
+		<td mat-cell *matCellDef="let artikel">
+			<mat-checkbox (click)="checkArtikel(artikel)" (change)="$event ? selection.toggle(artikel) : null"
+				[checked]="selection.isSelected(artikel)" [disabled]="checkboxesDisabled">
+			</mat-checkbox>
+		</td>
+	</ng-container>
+
+	<!-- Naam Column -->
+	<ng-container matColumnDef="naam">
+		<th mat-header-cell *matHeaderCellDef> Naam </th>
+		<td mat-cell *matCellDef="let artikel"> {{artikel.naam}} </td>
+	</ng-container>
+
+	<!-- Artikelnummer Column -->
+	<ng-container matColumnDef="artikelNummer">
+		<th mat-header-cell *matHeaderCellDef> Artikelnummer </th>
+		<td mat-cell *matCellDef="let artikel"> {{artikel.artikelNummer}} </td>
+	</ng-container>
+
+	<!-- Aantal Column -->
+	<ng-container matColumnDef="aantal">
+		<th mat-header-cell *matHeaderCellDef> Aantal </th>
+		<td mat-cell *matCellDef="let artikel"> {{artikel.aantal}} </td>
+	</ng-container>
+
+	<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+	<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

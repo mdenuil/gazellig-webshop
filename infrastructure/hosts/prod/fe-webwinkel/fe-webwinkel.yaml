@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe-webwinkel
+  namespace: gazellig-prod
+spec:
+  selector:
+    matchLabels:
+      name: fe-webwinkel
+  template:
+    metadata:
+      labels:
+        name: fe-webwinkel
+    spec:
+      containers:
+        - name: fe-webwinkel
+          image: **/gazellig/fe-webwinkel:master-1
+          livenessProbe:
+            httpGet:
+              port: 4200
+              path: /
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 4200
+              path: /
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "30m"
+            limits:
+              memory: "150Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 4200
+      imagePullSecrets:
+        - name: **
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-webwinkel
+  namespace: gazellig-prod
+spec:
+  selector:
+    name: fe-webwinkel
+  ports:
+    - protocol: TCP
+      port: 4200
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: fe-webwinkel
+  namespace: gazellig-prod
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /gazellig-fe-webwinkel/prod(/|$)(.*)
+            backend:
+              serviceName: fe-webwinkel
+              servicePort: 4200

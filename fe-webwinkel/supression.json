@@ -1,0 +1,23 @@
+{
+    "hoek" : {
+        "paths": [
+            "karma>log4js>loggly>request>hawk>boom>hoek",
+            "karma>log4js>loggly>request>hawk>cryptiles>boom>hoek",
+            "karma>log4js>loggly>request>hawk>hoek",
+            "karma>log4js>loggly>request>hawk>sntp>hoek"
+            ],
+        "reason" : "We accepteren dit risico en wachten tot karma deze dependency upgrade"
+    },
+    "tunnel-agent" : {
+        "paths": [
+            "karma>log4js>loggly>request>tunnel-agent"
+          ],
+        "reason" : "We accepteren dit risico en wachten tot karma deze dependency upgrade"
+    },
+    "debug" : {
+        "paths": [
+            "karma-typescript>log4js>streamroller>debug"
+        ],
+        "reason" : "We accepteren dit risico en wachten tot karma deze dependency upgrade"
+    }
+}

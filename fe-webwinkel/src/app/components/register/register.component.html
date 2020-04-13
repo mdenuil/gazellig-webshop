@@ -1,0 +1,50 @@
+<main>
+	<form [formGroup]="registreerForm" (ngSubmit)="onSubmit()">
+		<mat-form-field>
+			<input type="email" matInput placeholder="Email" formControlName="email" required />
+			<mat-error *ngIf="f.email.errors?.required">
+				This field is required
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field>
+			<input type="password" matInput placeholder="Password" formControlName="wachtwoord" required />
+			<mat-error *ngIf="f.wachtwoord.errors?.required">
+				This field is required
+			</mat-error>
+			<mat-error *ngIf="f.wachtwoord.errors?.minLength?.actualLength < 8">
+				Minimum length of 8
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field>
+			<input type="password" matInput placeholder="Repeat password" formControlName="wachtwoordCheck" required />
+			<mat-error *ngIf="f.wachtwoordCheck.errors?.required">
+				This field is required
+			</mat-error>
+			<mat-error *ngIf="f.wachtwoordCheck.errors?.minLength?.actualLength < 8">
+				Minimum length of 8
+			</mat-error>
+		</mat-form-field>
+		<mat-error *ngIf="registreerForm.errors?.passwordsMatch">
+			Passwords don't match
+		</mat-error>
+
+		<mat-form-field>
+			<input type="text" matInput placeholder="Initials" formControlName="initialen" required />
+			<mat-error *ngIf="f.initialen.errors?.required">
+				This field is required
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field>
+			<input type="text" matInput placeholder="Last name" formControlName="achternaam" required />
+			<mat-error *ngIf="f.achternaam.errors?.required">
+				This field is required
+			</mat-error>
+		</mat-form-field>
+
+		<button mat-raised-button color="primary" [disabled]="registreerForm.invalid || loading">
+			Register
+			<mat-spinner [diameter]="18" *ngIf="loading"></mat-spinner>
+		</button>
+	</form>
+</main>

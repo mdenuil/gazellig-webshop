@@ -1,0 +1,29 @@
+<div *ngIf="loaded">
+	<div id="image-container" (click)="openDetails()">
+		<img id="image" src="./assets/product/{{artikel.afbeeldingUrl}}" alt="Article image">
+	</div>
+
+	<div id="info-container">
+		<p id="name" (click)="openDetails()">{{ artikel.naam }}</p>
+		<div id="item-info" (click)="openDetails()">
+			<p id="stock">{{ artikel.aantal | inStock }} In stock</p>
+			<div id="spacer"></div>
+			<p id="price">{{ artikel.prijs | currency: 'EUR' }}</p>
+		</div>
+
+		<div id="cart-info" *ngIf="!inCart">
+			<mat-form-field>
+				<mat-icon matPrefix (click)="subtractAmount()">remove</mat-icon>
+				<input type="number" disabled min="1" matInput [(value)]="besteldArtikel.aantal">
+				<mat-icon matSuffix (click)="addAmount()">add</mat-icon>
+			</mat-form-field>
+			<button (click)="addToCart()" mat-raised-button color="primary">
+				Order now
+			</button>
+		</div>
+
+		<button *ngIf="inCart" routerLink="/shopping-cart" mat-raised-button color="accent">
+			In shopping cart
+		</button>
+	</div>
+</div>

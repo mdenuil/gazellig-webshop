@@ -1,0 +1,149 @@
+{
+  "properties": [
+    {
+      "name": "rabbitmq.topics.BestellingGeplaatstEvent",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingGeplaatstEvent."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingAanBestellenToegevoegd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingAanBestellenToegevoegd."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingAfgerond",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingAfgerond."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingInAfwachting",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingInAfwachting."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingInBehandeling",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingInBehandeling."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingVerstuurd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingVerstuurd."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingBetaald",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingBetaald."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingStatusInAfwachting",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingStatusInAfwachting."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingStatusInBehandeling",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingStatusInBehandeling."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingStatusVerstuurd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingStatusVerstuurd."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingStatusBetaald",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingStatusBetaald."
+    },
+    {
+      "name": "rabbitmq.topics.ArtikelAanCatalogusToegevoegd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.ArtikelAanCatalogusToegevoegd."
+    },
+    {
+      "name": "rabbitmq.topics.VoorraadVerhoogd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.VoorraadVerhoogd."
+    },
+    {
+      "name": "rabbitmq.topics.VoorraadVerlaagd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.VoorraadVerlaagd."
+    },
+    {
+      "name": "rabbitmq.event.exchange",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.event.exchange."
+    },
+    {
+      "name": "auditlog.url",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.url."
+    },
+    {
+      "name": "auditlog.port",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.port."
+    },
+    {
+      "name": "auditlog.replay.exchange",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.replay.exchange."
+    },
+    {
+      "name": "auditlog.replay.queue",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.replay.queue."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingKlaarVoorVerwerken",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingKlaarVoorVerwerken."
+    },
+    {
+      "name": "rabbitmq.topics.VoorraadVerlaagdPcsBestellen",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.VoorraadVerlaagdPcsBestellen."
+    },
+    {
+      "name": "magazijnservice.url",
+      "type": "java.lang.String",
+      "description": "Description for magazijnservice.url."
+    },
+    {
+      "name": "magazijnservice.port",
+      "type": "java.lang.String",
+      "description": "Description for magazijnservice.port."
+    },
+    {
+      "name": "magazijnservice.endpoint",
+      "type": "java.lang.String",
+      "description": "Description for magazijnservice.endpoint."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingBehandelbaar",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingBehandelbaar."
+    },
+    {
+      "name": "rabbitmq.topics.BestellingStatusBehandelbaar",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.BestellingStatusBehandelbaar."
+    },
+    {
+      "name": "magazijnservice.endpointVerlaagVoorraad",
+      "type": "java.lang.String",
+      "description": "Description for magazijnservice.endpointVerlaagVoorraad."
+    },
+    {
+      "name": "magazijnservice.endpointVerhoogVoorraad",
+      "type": "java.lang.String",
+      "description": "Description for magazijnservice.endpointVerhoogVoorraad."
+    },
+    {
+      "name": "rabbitmq.queue.identifier",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.queue.identifier."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+@import "~@angular/material/theming";
+@import '../../../custom-theme.scss';
+
+mat-grid-list {
+	background-color: mat-color($primary, 50);
+}
+
+em.material-icons {
+	font-size: 38px;
+	width: 38px;
+}
+
+ul {
+    list-style: none;
+}
+
+div {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: left !important;
+	margin-left: 50px;
+}
+
+@media screen and (max-width: 850px) {
+	mat-grid-tile {
+		display: inline;
+	}
+}

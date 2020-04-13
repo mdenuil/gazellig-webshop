@@ -1,0 +1,59 @@
+@import "~@angular/material/theming";
+@import '../../../custom-theme.scss';
+
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 200px;
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar {
+  position: fixed;
+  top: 0;
+  z-index: 1;
+}
+
+#title {
+	margin-left: 25px;
+}
+
+#spacer {
+	flex: 1 1 auto;
+}
+
+#cart, #login, #logout, #myOrders {
+	margin-right: 25px;
+	margin-top: 20px;
+	position: relative;
+	text-align: center;
+}
+
+mat-icon {
+	width: 40px;
+	height: 40px;
+}
+
+#cart mat-icon {
+	color: mat-color($primary);
+}
+
+#cart mat-icon:hover {
+	color: mat-color($primary, lighter);
+}
+
+#cart div {
+	position: absolute;
+    background-color: #ffd121;
+    border-radius: 100%;
+    top: -8px;
+    right: -10px;
+    padding: 5px;
+    line-height: 70%;
+    font-size: 18px;
+}

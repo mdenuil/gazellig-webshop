@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miffy-auditlog
+  namespace: gazellig-prod
+spec:
+  selector:
+    matchLabels:
+      name: miffy-auditlog
+  template:
+    metadata:
+      labels:
+        name: miffy-auditlog
+    spec:
+      containers:
+        - name: miffy-auditlog
+          image: minor2019.azurecr.io/kantilever-auditlog:1.0
+          env:
+          - name: eventbus-hostname
+            value: rabbitmq
+          - name: eventbus-port
+            value: "5672"
+          - name: eventbus-username
+            value: Kantilever
+          - name: eventbus-password
+            value: Kantilever
+          - name: AuditLogDbConnection
+            value: Host=postgresdatabase;Port=5432;Database=AuditLogDb;Username=postgres;Password=Geheim_101
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+          - containerPort: 80
+            name: http
+      imagePullSecrets:
+        - name: minor2019
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: miffy-auditlog
+  namespace: gazellig-prod
+spec:
+  selector:
+    name: miffy-auditlog
+  ports:
+  - name: http
+    protocol: TCP
+    port: 2022
+    targetPort: 80

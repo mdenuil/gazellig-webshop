@@ -1,0 +1,39 @@
+<mat-grid-list [cols]="breakpoint" rowHeight="75px" (window:resize)="onResize($event)">
+	<mat-grid-tile [colspan]="colspan">
+		<h1>Kantilever B.V.</h1>
+	</mat-grid-tile>
+	<mat-grid-tile>
+		<div>
+			<mat-icon class="material-icons">
+				maps
+			</mat-icon>
+			<ul>
+				<li>Kruisboog 42</li>
+				<li>3905 TG Veenendaal</li>
+			</ul>
+		</div>
+	</mat-grid-tile>
+	<mat-grid-tile>
+		<div>
+			<mat-icon class="material-icons">
+				chat_bubble_outline
+			</mat-icon>
+			<ul>
+				<li>Tel: +31 318 552020</li>
+				<li>Email: info@kantilever.nl</li>
+			</ul>
+		</div>
+	</mat-grid-tile>
+	<mat-grid-tile>
+		<div>
+			<mat-icon class="material-icons">
+				business
+			</mat-icon>
+			<ul>
+				<li>IBAN: NL44 INGB 00058 54051</li>
+				<li>K.v.K. 3013 5370</li>
+				<li>BTW NL8062.30.277.B01</li>
+			</ul>
+		</div>
+	</mat-grid-tile>
+</mat-grid-list>

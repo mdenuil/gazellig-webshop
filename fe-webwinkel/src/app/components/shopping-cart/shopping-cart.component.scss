@@ -1,0 +1,81 @@
+main {    
+	display: inline-block;
+    width: calc(100% - 300px);
+	margin-bottom: 25px;
+}
+
+#noProducts {
+	font-size: x-large;
+}
+
+section#form, section#login {
+    width: 45%;
+	margin-top: 50px;
+    display: block;
+    float: right;
+}
+
+section#login {
+	margin-top: 30px;
+}
+
+app-login {
+	padding-top: 0px !important;
+}
+
+#items {
+	width: 45%;
+	display: inline-block;
+}
+
+section#articles {
+	width: 100%;
+	display: inline-block;
+	margin-top: 50px;
+	max-height: 100%;
+	overflow-x: hidden;
+}
+
+section#totals {
+	width: 100%;
+	text-align: right;
+}
+
+section#totals table {
+	width: auto;
+    margin-right: 0px;
+    margin-left: auto;
+}
+
+section#totals table tr td {
+	padding-right: 15px;
+}
+
+#total {
+	font-size: x-large;
+	font-weight: bold;
+	padding-right: 15px;
+}
+
+#totalWithoutVAT {
+	font-size: large;
+	padding-right: 15px;
+}
+
+@media screen and (max-width: 1050px) {
+	main {
+		display: inline-block;
+		width: calc(100% - 100px);
+		margin-left: 50px;
+		margin-right: 50px;
+	}
+
+	section#form, section#login {
+		width: 100%;
+		float: left;
+	}
+
+	#items {
+		width: 100%;
+	}
+}

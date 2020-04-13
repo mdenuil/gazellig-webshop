@@ -1,0 +1,22 @@
+<mat-toolbar color="primary-superlight">
+	<a id="title" routerLink="/">
+		<h1>Kantilever</h1>
+	</a>
+
+	<span id="spacer"></span>
+
+	<a *ngIf="!isLoggedIn" id="login" routerLink="/login" title="Log in">
+		<mat-icon style="font-size: 40px;">input</mat-icon>
+	</a>
+	<a *ngIf="isLoggedIn" id="logout" routerLink="/" (click)="logout()" title="Log out">
+		<mat-icon style="font-size: 40px;">logout</mat-icon>
+	</a>
+	<a *ngIf="isLoggedIn" id="myOrders" routerLink="/my-orders" title="My orders">
+		<mat-icon style="font-size: 40px;">local_shipping</mat-icon>
+	</a>
+
+	<a id="cart" routerLink="/shopping-cart" title="Shopping cart">
+		<mat-icon style="font-size: 40px;">shopping_cart</mat-icon>
+		<div *ngIf="numberOfArtikelen">{{ numberOfArtikelen }}</div>
+	</a>
+</mat-toolbar>

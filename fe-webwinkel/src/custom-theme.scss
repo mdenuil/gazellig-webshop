@@ -1,0 +1,73 @@
+$mat-app-primary: (
+    50 : #e6e7f1,
+    100 : #c0c4dd,
+    200 : #969cc7,
+    300 : #6c74b0,
+    400 : #4d579f,
+    500 : #2d398e,
+    600 : #283386,
+    700 : #222c7b,
+    800 : #1c2471,
+    900 : #11175f,
+    A100 : #969dff,
+    A200 : #636dff,
+    A400 : #303eff,
+    A700 : #1626ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #ffffff,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #ffffff,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+
+$mat-app-accent: (
+    50 : #ffffff,
+    100 : #fff8de,
+    200 : #ffeca6,
+    300 : #ffde5e,
+    400 : #ffd740,
+    500 : #ffd121,
+    600 : #ffcb02,
+    700 : #e3b400,
+    800 : #c49c00,
+    900 : #a68300,
+    A100 : #ffffff,
+    A200 : #fff1ba,
+    A400 : #ffdc54,
+    A700 : #ffd63a,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$primary: mat-palette($mat-app-primary);
+$primary-superlight: mat-color($primary, 50);
+$accent: mat-palette($mat-app-accent);
+
+$custom-theme: mat-light-theme($primary, $accent);
+
+@include angular-material-theme($custom-theme);

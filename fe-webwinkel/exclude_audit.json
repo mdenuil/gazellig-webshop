@@ -1,0 +1,15 @@
+{
+    "ws": [
+        {
+            "id": 8405001082,
+            "title": "Insufficiently Random Values",
+            "description": "An insufficient implementation of random is used, leading to cryptographic insecurity.",
+            "versions": [
+                "&lt;<2.0.0-beta.0"
+            ],
+            "dependencyPaths": [
+                "/protractor/webdriver-js-extender/selenium-webdriver/ws"
+            ]
+        }
+    ]
+}

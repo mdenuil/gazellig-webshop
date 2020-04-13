@@ -1,0 +1,49 @@
+{
+  "properties": [
+    {
+      "name": "rabbitmq.topics.WinkelmandjeAanWinkelenToegevoegd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.WinkelmandjeAanWinkelenToegevoegd."
+    },
+    {
+      "name": "rabbitmq.topics.WinkelmandjeAangepast",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.WinkelmandjeAangepast."
+    },
+    {
+      "name": "rabbitmq.event.exchange",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.event.exchange."
+    },
+    {
+      "name": "rabbitmq.topics.WinkelmandjeAangemaakt",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.WinkelmandjeAangemaakt."
+    },
+    {
+      "name": "auditlog.url",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.url."
+    },
+    {
+      "name": "auditlog.port",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.port."
+    },
+    {
+      "name": "auditlog.replay.exchange",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.replay.exchange."
+    },
+    {
+      "name": "auditlog.replay.queue",
+      "type": "java.lang.String",
+      "description": "Description for auditlog.replay.queue."
+    },
+    {
+      "name": "rabbitmq.topics.KlantToegevoegd",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.topics.KlantToegevoegd."
+    }
+  ]
+}

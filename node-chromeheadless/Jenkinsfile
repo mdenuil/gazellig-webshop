@@ -1,0 +1,56 @@
+pipeline {
+    agent { label 'master' }
+
+    options {
+        gitLabConnection("gitlab-connection")
+        gitlabBuilds(builds: ['Build-Finished'])
+        timestamps()
+        disableConcurrentBuilds()
+        disableResume()
+    }
+
+    triggers {
+        gitlab(triggerOnPush: true, triggerOnMergeRequest: true, branchFilterType: "All")
+    }
+
+    post {
+        success {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'failed'
+        }
+    }
+
+    stages {
+        stage("Docker") {
+            stages {
+                stage("Build image") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                // Replace all of '\', '/', ':', '"', '<', '>', '|', '?' and '*' for the allowed character '_'
+                                branchNameWithoutIllegalCharacters = BRANCH_NAME.replaceAll(/[\\\/:"<>|?*]/) { m -> "_" }
+                                
+                                dockerImageName = "gazellig/node-chromeheadless:latest"
+                                image = docker.build("${dockerImageName}", "./")
+                            }
+                        }
+                    }
+                }
+
+                stage("Push image") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                docker.withRegistry("**", '**') {
+                                    image.push()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

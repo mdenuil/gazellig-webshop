@@ -1,0 +1,263 @@
+pipeline {
+    // In order to make the 'Build-Finished' Gitlab phase work, we need an agent with a git clone.
+    agent { label 'master' }
+
+    options {
+        // Use the GitLab connection named 'gitlab-connection', available in Endeavour Jenkins buildservers
+        gitLabConnection("gitlab-connection")
+        gitlabBuilds(builds: ['Build-Finished'])
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // No concurrent builds of this branch
+        disableConcurrentBuilds()
+        // No resume on Jenkins start
+        disableResume()
+    }
+
+    environment {
+        DOCKER_REGISTRY = "**"
+        MICROSERVICE_NAME = "ds-medewerkerbeheer"
+    }
+
+    triggers {
+        // Make gitlab trigger builds on all code changes
+        gitlab(
+            triggerOnPush: true, 
+            triggerOnMergeRequest: true,
+            skipWorkInProgressMergeRequest: true,
+            branchFilterType: "NameBasedFilter", 
+            includeBranchesSpec: "master, develop, feature/*"
+        )
+    }
+
+    // Update commitstatus to Gitlab to enable auto-merging of the build in case of success
+    post {
+        success {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'failed'
+        }
+        always {
+            cleanWs()
+        }
+    }
+
+    stages {
+        stage("Run with JDK 12 and maven") {
+            // Run all maven commands in a separate Docker container supplying maven
+            agent {
+                docker {
+                    //docker image with maven and jdk 11 installed to complete these stages
+                    image 'maven:3.6-jdk-12'
+                    // It's possible to add extra volumes to the host here. The volumes to /root/.m2 and /root/.sonar are already present in Endeavour Jenkins buildservers
+                }
+            }
+            stages {
+                stage("Update version") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                /**********************************************
+                                * Prepare pom file for current build version *
+                                **********************************************/
+                                pom = readMavenPom file: "pom.xml"
+                                if ("${BRANCH_NAME}".equalsIgnoreCase("master")) {
+                                    // Builds on master can get the regular version number
+                                    newVersion = "${pom.version}.${BUILD_NUMBER}"
+                                } else {
+                                    // Replace all of '\', '/', ':', '"', '<', '>', '|', '?' and '*' for the allowed character '_'
+                                    branchNameWithoutIllegalCharacters = BRANCH_NAME.replaceAll(/[\\\/:"<>|?*]/) { m -> "_" }
+                                    // In case of a branch build, you need to make the artifacts unique from other branches
+                                    newVersion = "${pom.version}.${branchNameWithoutIllegalCharacters}.${BUILD_NUMBER}"
+                                }
+                                sh "mvn versions:set -DnewVersion=${newVersion}"
+                            }
+                        }
+                    }
+                }
+                stage("Compile") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            sh "mvn clean compile"
+                        }
+                    }
+                }
+//                 stage("Run Test") {
+//                     steps {
+//                         gitlabCommitStatus(name: STAGE_NAME) {
+//                             sh "mvn test"
+//                         }
+//                     }
+//                 }
+//                 stage("Run Integration Tests") {
+//                     steps {
+//                         gitlabCommitStatus(name: STAGE_NAME) {
+//                             sh "mvn verify -Dskip.surefire.tests"
+//                         }
+//                     }
+//                 }
+//                 stage('Generate Javadoc') {
+//                     steps {
+//                         gitlabCommitStatus(name: STAGE_NAME) {
+//                             sh "mvn javadoc:javadoc"
+//                         }
+//                     }
+//                 }
+                stage("Package") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            // Package the software
+                            // skip tests, to speedup pipeline
+                            sh "mvn package -Dmaven.test.skip=true"
+                            
+                            // Stash the repo including files needed for the sonarqube Analysis
+                            stash name: 'AppFiles', includes: '**'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("SonarQube analysis") {
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    unstash 'AppFiles'
+                    /**************************************************************************
+                    * Run SonarQube analysis *
+                    **************************************************************************/
+                    withSonarQubeEnv("sonar") {
+                        sh "mvn sonar:sonar"
+                    }
+                    timeout(time: 30, unit: "MINUTES") {
+                        waitForQualityGate abortPipeline: false
+                    }
+                }
+            }
+        }
+
+//         stage("Upload artifact to Nexus") {
+//             when {
+// 				anyOf {
+// 					branch 'master';
+// 					branch 'develop'
+// 				}
+// 			}
+//
+//             steps {
+//                 gitlabCommitStatus(name: STAGE_NAME) {
+//                     /********************************
+//                     * Upload the artifact to Nexus *
+//                     ********************************/
+//                     sh "mvn deploy -Dmaven.main.skip -Dmaven.test.skip=true"
+//                 }
+//             }
+//         }
+
+        stage("Build docker image") {
+            when { 
+				anyOf { 
+					branch 'master'; 
+					branch 'develop' 
+				} 
+			}
+
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    /********************************
+                    * Build the docker image *
+                    ********************************/
+                    script {
+                        // Replace all of '\', '/', ':', '"', '<', '>', '|', '?' and '*' for the allowed character '_'
+                        branchNameWithoutIllegalCharacters = BRANCH_NAME.replaceAll(/[\\\/:"<>|?*]/) { m -> "_" }
+
+                        dockerImageName = "gazellig/microservice-${MICROSERVICE_NAME}:${branchNameWithoutIllegalCharacters}-${BUILD_NUMBER}"
+                        image = docker.build("${dockerImageName}", "--build-arg APP_VERSION=${newVersion} .")
+                    }
+                }
+            }
+        }
+
+        stage("Push docker image") {
+            /********************************
+            * Upload the image to the Docker registry *
+            ********************************/
+            when { 
+				anyOf { 
+					branch 'master'; 
+					branch 'develop' 
+				} 
+			}
+
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    script {
+                        docker.withRegistry("**", '**') {
+                            image.push()
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Update test version in infra") {
+            when {
+                branch "develop"
+            }
+
+            /********************************
+             * Trigger job to update version in test hosts compose files located in the Infra project *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                     build job: "gazellig-update-kubernetes", parameters: [string(name: 'PHASE', value: 'test'), string(name: 'DOCKER_IMAGE', value: dockerImageName)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+		stage("Deploy to Azure test environment") {
+            when {
+                branch "develop"
+            }
+
+            /********************************
+             * Trigger job to deploy to Azure test environment *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    build job: "gazellig-deploy", parameters: [string(name: 'PHASE', value: 'test'), string(name: 'PROJECT_NAME', value: MICROSERVICE_NAME)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+		stage("Update prod version in infra") {
+            when {
+                branch "master"
+            }
+
+            /********************************
+             * Trigger job to update version in prod hosts compose files located in the Infra project *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                     build job: "gazellig-update-kubernetes", parameters: [string(name: 'PHASE', value: 'prod'), string(name: 'DOCKER_IMAGE', value: dockerImageName)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+		stage("Deploy to Azure prod environment") {
+            when {
+                branch "master"
+            }
+
+            /********************************
+             * Trigger job to deploy to Azure prod environment *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    build job: "gazellig-deploy", parameters: [string(name: 'PHASE', value: 'prod'), string(name: 'PROJECT_NAME', value: MICROSERVICE_NAME)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+    }
+}

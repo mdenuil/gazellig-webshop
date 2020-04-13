@@ -1,0 +1,22 @@
+<dependency isVirtual="false">
+    <fileName>{module_name}</fileName>
+    <filePath>{filepath}</filePath>
+    <md5></md5>
+    <sha1></sha1>            
+    <vulnerabilities>
+        <{vulnerabilityType} source="NVD">
+            <name>{title}</name>
+            <cvssScore>{cvss}</cvssScore>
+            <cvssAccessVector></cvssAccessVector>
+            <cvssAccessComplexity></cvssAccessComplexity>
+            <cvssAuthenticationr></cvssAuthenticationr>
+            <cvssConfidentialImpact></cvssConfidentialImpact>
+            <cvssIntegrityImpact></cvssIntegrityImpact>
+            <cvssAvailabilityImpact></cvssAvailabilityImpact>
+            <severity>{severity}</severity>
+            <cwe>{cwe}</cwe>
+            <description>{overview}</description>
+            <notes>{recommendation}</notes>
+        </{vulnerabilityType}>
+    </vulnerabilities>
+</dependency>

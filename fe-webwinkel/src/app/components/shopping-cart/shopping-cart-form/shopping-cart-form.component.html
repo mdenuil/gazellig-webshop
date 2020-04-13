@@ -1,0 +1,36 @@
+<form [formGroup]="form" (submit)="submitForm()">
+	<p id="contact-title">Contact information</p>
+	<div id="contact-fields">
+		<mat-form-field>
+			<input matInput placeholder="Initials" formControlName="initialen">
+		</mat-form-field>
+		<mat-form-field>
+			<input matInput placeholder="Last name" formControlName="achternaam">
+		</mat-form-field>
+		<div class="break"></div>
+		<mat-form-field>
+			<input matInput placeholder="Email" formControlName="email">
+		</mat-form-field>
+	</div>
+
+	<p id="address-title">Address information</p>
+	<div id="address-fields">
+		<mat-form-field>
+			<input matInput placeholder="Street" formControlName="straatnaam">
+		</mat-form-field>
+		<mat-form-field>
+			<input matInput placeholder="Housenumber" formControlName="huisnummer">
+		</mat-form-field>
+		<div class="break"></div>
+		<mat-form-field>
+			<input matInput placeholder="Zipcode" formControlName="postcode">
+		</mat-form-field>
+		<mat-form-field>
+			<input matInput placeholder="City" formControlName="woonplaats">
+		</mat-form-field>
+	</div>
+
+	<div id="submit">
+		<button [disabled]="form.invalid" mat-raised-button color="accent">Confirm order »</button>
+	</div>
+</form>

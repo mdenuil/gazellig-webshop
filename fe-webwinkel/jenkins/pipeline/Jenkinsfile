@@ -1,0 +1,270 @@
+pipeline {
+    // In order to make the 'Build-Finished' Gitlab phase work, we need an agent.
+    agent { label 'master' }
+
+    options {
+        // Use the GitLab connection named 'gitlab-connection', available in Endeavour Jenkins buildservers
+        gitLabConnection("gitlab-connection")
+        gitlabBuilds(builds: ['Build-Finished'])
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // No concurrent builds of this branch
+        disableConcurrentBuilds()
+        // No resume on Jenkins start
+        disableResume()
+    }
+
+    environment {
+        DOCKER_REGISTRY = "**"
+        MICROSERVICE_NAME = "fe-webwinkel"
+    }
+
+    triggers {
+        // Make gitlab trigger builds on all code changes
+        gitlab(
+            triggerOnPush: true, 
+            triggerOnMergeRequest: true,
+            skipWorkInProgressMergeRequest: true,
+            branchFilterType: "NameBasedFilter", 
+            includeBranchesSpec: "master, develop, feature/*"
+        )
+    }
+
+    // Update commitstatus to Gitlab to enable auto-merging of the build in case of success
+    post {
+        success {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'Build-Finished', state: 'failed'
+        }
+        always {
+            cleanWs()
+        }
+    }
+
+    stages {
+        stage('Node') {
+            agent {
+                docker {
+                    image '**/gazellig/node-chromeheadless:latest'
+                }
+            }
+            stages {
+                stage('Setup') {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            sh "npm install"
+                        }
+                    }
+                }
+
+				stage("Update version") {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                /**********************************************
+                                * Prepare pom file for current build version *
+                                **********************************************/
+                                packageJSON = readJSON file: 'package.json'
+
+                                newVersion = "${packageJSON.version}"
+
+                                // Change the version number in package.json
+                                sh "npm --no-git-tag-version version ${newVersion} --allow-same-version --force"
+                            }
+                        }
+                    }
+                }
+
+                stage('Build') {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            script {
+                                if (BRANCH_NAME == "master") {                                   
+                                    sh "npm run build"
+                                } else {
+                                    sh "npm run build:test"
+                                } 
+                            }
+                        }
+                    }
+                }
+
+                stage('Test') {
+                    steps {
+                        gitlabCommitStatus(name: STAGE_NAME) {
+                            sh "npm run test"
+                        }
+                    }
+                }
+
+				// stage('Dependency Check') {
+                //     steps {
+                //         gitlabCommitStatus(name: STAGE_NAME) {
+                //             // Run audit to check for vulnerable packages
+                //             sh "npm audit --json > audit.json || true"
+                //             // Convert 'audit.json' to 'dependency-check-report.xml'
+                //             sh "npm run dependency-check"
+                //         }
+                //     }
+                // }
+
+				stage('Stash') {
+                    steps {
+                        // Stash all files needed for the sonarqube Analysis
+                        stash name: 'SonarQubeResultFiles', includes: 'coverage/lcov.info'
+                        // Stash all files needed for docker build
+                        stash name: 'AppProductionFiles', includes: 'docker/**'
+                    }
+                }
+            }
+        }
+
+		stage('SonarQube') {
+			agent {
+				// Run the SonarQube analysis with the sonar-scanner Docker container with NodeJS support
+				docker '**/sonar-scanner:node-10'
+			}
+			options {
+				// No checkout needed, because we get our stuff from the stash
+				skipDefaultCheckout()
+			}
+			steps {
+				gitlabCommitStatus(name: STAGE_NAME) {
+					// Unstash all files needed for the sonarqube Analysis
+					unstash 'SonarQubeResultFiles'
+
+					// Run Sonar Scanner with typescript support
+					withSonarQubeEnv("sonar") {
+						sh 'npm install typescript'
+						sh 'sonar-scanner'
+					}
+
+					// Wait for the callback from SonarQube to enable the build to fail
+					timeout(time: 30, unit: "MINUTES") {
+						waitForQualityGate abortPipeline: false
+					}
+				}
+			}
+		}
+
+		stage('Build Docker image') {
+			when { 
+				anyOf { 
+					branch 'master'; 
+					branch 'develop' 
+				} 
+			}
+
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    script {
+                        // Replace all of '\', '/', ':', '"', '<', '>', '|', '?', '_' and '*' for the allowed character '-'
+                        branchNameWithoutIllegalCharacters = BRANCH_NAME.replaceAll(/[\\\/:"<>|?*]/) { m -> "-" }
+                        dockerImageName = "gazellig/${MICROSERVICE_NAME}:${branchNameWithoutIllegalCharacters}-${BUILD_NUMBER}"
+                        unstash 'AppProductionFiles'
+                        image = docker.build(dockerImageName, "--build-arg APP_VERSION=${packageJSON.version} ./docker")
+                    }
+                }
+            }
+        }
+
+		stage("Push docker image") {
+            when { 
+				anyOf { 
+					branch 'master'; 
+					branch 'develop' 
+				} 
+			}
+
+            /********************************
+            * Upload the image to the Docker registry *
+            ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    script {
+                        docker.withRegistry("**", '**') {
+                            image.push()
+                        }
+                    }
+                }
+            }
+        }
+
+		stage("Update test version in infra") {
+            when {
+                branch "develop"
+            }
+
+            /********************************
+             * Trigger job to update version in test hosts compose files located in the Infra project *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                     build job: "gazellig-update-kubernetes", parameters: [string(name: 'PHASE', value: 'test'), string(name: 'DOCKER_IMAGE', value: dockerImageName)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+		stage("Deploy to Azure test environment") {
+            when {
+                branch "develop"
+            }
+
+            /********************************
+             * Trigger job to deploy to Azure test environment *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    build job: "gazellig-deploy", parameters: [string(name: 'PHASE', value: 'test'), string(name: 'PROJECT_NAME', value: MICROSERVICE_NAME)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+        stage("E2E test Azure test environment") {
+            when {
+                branch "develop"
+            }
+
+            /********************************
+             * Trigger job to deploy to Azure test environment *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    build job: "gazellig-e2e-testing", parameters: [string(name: 'PHASE', value: 'test')], quietPeriod: 0, propagate: false, wait: true
+                }
+            }
+        }
+
+		stage("Update prod version in infra") {
+            when {
+                branch "master"
+            }
+
+            /********************************
+             * Trigger job to update version in prod hosts compose files located in the Infra project *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                     build job: "gazellig-update-kubernetes", parameters: [string(name: 'PHASE', value: 'prod'), string(name: 'DOCKER_IMAGE', value: dockerImageName)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+
+		stage("Deploy to Azure prod environment") {
+            when {
+                branch "master"
+            }
+
+            /********************************
+             * Trigger job to deploy to Azure prod environment *
+             ********************************/
+            steps {
+                gitlabCommitStatus(name: STAGE_NAME) {
+                    build job: "gazellig-deploy", parameters: [string(name: 'PHASE', value: 'prod'), string(name: 'PROJECT_NAME', value: MICROSERVICE_NAME)], quietPeriod: 0, propagate: true, wait: true
+                }
+            }
+        }
+    }
+}

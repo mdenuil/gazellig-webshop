@@ -1,0 +1,17 @@
+#main {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+app-navigation {
+	height: 64px;
+}
+
+router-outlet {
+	display: block;
+}
+
+#content {
+	flex: 1;
+}

@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'PHASE', choices: "test\nprod", description: "Is the host for 'test' or for 'production'?")
+        string(name: 'DOCKER_IMAGE', description: 'Name of the Docker image, including the registry and including the tag')
+    }
+
+    options {
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // No concurrent builds
+        disableConcurrentBuilds()
+        // Remove old builds
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage("Prepare") {
+            steps {
+                script {
+                    gitUtils            = load("scripts/shared/gitUtils.groovy")
+                    phasePath           = "hosts/${PHASE}"
+                    dockerImageBaseName = DOCKER_IMAGE.tokenize(':')[0]
+                    if (!fileExists(phasePath)) {
+                        error "Couldn't find the phase for the given host. Tried to find at location: ${phasePath}/"
+                    }
+                }
+            }
+        }
+
+        stage("Update versions") {
+            steps {
+                script {
+                    dir(phasePath) {
+                        exitCodeCommit = sh(script: """#!/bin/bash -e
+                            # finding all kubernetes yaml files recursively and setting it in an array, excluding the scripts dir
+                            kubernetesfiles=( \$(find . -path  ./scripts -prune -or -name *.yaml -print) )
+
+                            #looping over all compose files
+                            for kubernetesfile in \${kubernetesfiles[@]}
+                            do
+                                echo "replacing in file: \$kubernetesfile"
+                                sed -i "s|${dockerImageBaseName}:[^[:space:]]*|${DOCKER_IMAGE}|" \$kubernetesfile
+
+                                echo "${dockerImageBaseName}"
+                                echo "${DOCKER_IMAGE}"
+
+                                git add \$kubernetesfile
+                            done
+                            git commit -m "[Jenkins Job] Updated '${dockerImageBaseName}' for phase '${PHASE}'"
+                        """, returnStatus:true)
+                        if (exitCodeCommit != 0 && PHASE == 'test') {
+                            error "Couldn't find line with '${dockerImageBaseName}' in any yaml file in '${phasePath}/'. Perhaps there was a version upgrade?"
+                        }
+                    }
+
+                    gitUtils.pullAndPush()
+                }
+            }
+        }
+    }
+}

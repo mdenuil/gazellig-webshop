@@ -1,0 +1,110 @@
+#close {
+	float: right;
+	cursor: pointer;
+}
+
+#main {
+	display: flex;
+}
+
+img {
+	width: 100%;
+    margin-right: 50px;
+}
+
+#content p {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#content button {
+	margin-top: 25px
+}
+
+#naam {
+	font-size: xx-large;
+	margin-bottom: 0.5em !important;
+}
+
+#prijs, #aantal {
+	font-size: x-large;
+	margin-top: 0;
+}
+
+#cart-info {
+    margin-top: 25px;
+}
+
+#cart-info {
+	mat-icon {
+		font-size: 100% !important;
+	}
+
+	mat-icon:hover {
+		cursor: pointer;
+	}
+
+	mat-form-field {
+		width: 33%;
+	}
+
+	input {
+		text-align: center;
+		color: black !important;
+	}
+
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	input[type=number] {
+		-moz-appearance:textfield;
+	}
+
+	button {
+		width: 60%;
+		margin-left: 10px;
+	}
+}
+
+#secondary {
+	margin-top: 25px;
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	table td {
+		border: 1px solid #ddd;
+		padding: 8px;
+    	min-width: 100px;
+	}
+
+	table tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+
+	table tr:hover {
+		background-color: #ddd;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	#main {
+		flex-direction: column;
+	}
+
+	#secondary {
+		table td {
+			display: table-row;
+			border: none;
+		}
+
+		table td:first-child {
+			font-weight: bold;
+		}
+	}
+}

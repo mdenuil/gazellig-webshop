@@ -1,0 +1,30 @@
+<div id="pakbon" mat-dialog-content>
+	<mat-grid-list cols="3" rowHeight="50px">
+		<mat-grid-tile [colspan]="1" [rowspan]="2">
+			<img src="assets/logo.png" alt="Kantilever logo">
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="2" [rowspan]="1">
+			<h1>Packing list</h1>
+		</mat-grid-tile>
+		<mat-grid-tile [colspan]="2" [rowspan]="1">
+			<h1>Order: {{ data.bestelNummer }}</h1>
+		</mat-grid-tile>
+	</mat-grid-list>
+
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Amount</th>
+		</tr>
+		<tr *ngFor="let artikel of data.artikelen">
+			<td>{{ artikel.naam }}</td>
+			<td>{{ artikel.aantal }}</td>
+		</tr>
+	</table>
+</div>
+<div id="actions" mat-dialog-actions>
+	<button mat-raised-button color="accent" printTitle="Kantilever packing list {{ data.bestelNummer }}"
+		[useExistingCss]="true" printSectionId="pakbon" ngxPrint (click)="print()">
+		Pakbon printen
+	</button>
+</div>

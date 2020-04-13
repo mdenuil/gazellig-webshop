@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'PHASE', choices: "test\nprod", description: "Is the host for 'test' or for 'production'?")
+        string(name: 'PROJECT_NAME', description: 'Name of the project to be deployed')
+    }
+
+    options {
+        // Show timestamps in logging. To be able to spot bottlenecks in the build
+        timestamps()
+        // Remove old builds
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        // No resume on Jenkins start
+        disableResume()
+    }
+
+    stages {
+        stage("Get environment") {
+            steps {
+                script {
+                    projectPath      = "hosts/${PHASE}/${PROJECT_NAME}"
+                    dir(projectPath) {
+                        def exitCode = sh script: 'find -name "*.yaml" | egrep .', returnStatus: true
+                        boolean exists = exitCode == 0
+
+                        if(!exists) {
+                            error "Couldn't find any kubernetes file for the given host. Tried to find at location: ${projectPath}/"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Kubernetes") {
+            agent {
+                docker {
+                    image '**/gazellig/kubectl:latest'
+                }
+            }
+
+            stages {
+                stage("Deploy") {
+                    steps {
+                        script {
+                            dir(projectPath) {
+                                sh "kubectl create namespace 'gazellig-${PHASE}' -o yaml --dry-run | kubectl apply -f - --namespace='gazellig-${PHASE}'"
+                                sh "kubectl create secret docker-registry '**' --docker-server='**' --docker-username='**' --docker-password='**' --docker-email='**' --namespace='gazellig-${PHASE}' -o yaml --dry-run | kubectl apply -f - --namespace='gazellig-${PHASE}'"
+                                sh "kubectl create secret docker-registry 'minor2019' --docker-server='**' --docker-username='Minor2019' --docker-password='**' --docker-email='**' --namespace='gazellig-${PHASE}' -o yaml --dry-run | kubectl apply -f - --namespace='gazellig-${PHASE}'"
+                                sh "kubectl apply -f . --namespace='gazellig-${PHASE}'"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

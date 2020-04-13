@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcs-bestellen
+  namespace: gazellig-prod
+spec:
+  selector:
+    matchLabels:
+      name: pcs-bestellen
+  template:
+    metadata:
+      labels:
+        name: pcs-bestellen
+    spec:
+      containers:
+        - name: pcs-bestellen
+          image: **/gazellig/microservice-pcs-bestellen:master-2
+          env:
+          - name: RABBITMQ_HOST
+            value: rabbitmq
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_USERNAME
+            value: Kantilever
+          - name: RABBITMQ_PASSWORD
+            value: Kantilever
+          - name: KANTILEVER_EXCHANGE
+            value: Kantilver.Eventbus
+          - name: BESTELLING_ROUTINGKEY
+            value: CommandSlaBestellingOp
+          - name: AUDITLOG_URL
+            value: http://miffy-auditlog
+          - name: AUDITLOG_PORT
+            value: "2022"
+          - name: DATASOURCE_URL
+            value: postgresql://postgresdatabase:5432
+          - name: DATASOURCE_NAME
+            value: pcsbestellendb
+          - name: DATASOURCE_USERNAME
+            value: postgres
+          - name: DATASOURCE_PASSWORD
+            value: Geheim_101
+          - name: MAGAZIJNSERVICE_URL
+            value: http://ds-magazijn
+          - name: MAGAZIJNSERVICE_PORT
+            value: "2021"
+          - name: MAGAZIJNSERVICE_ENDPOINT
+            value: HaalVoorraadUitMagazijn
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+          readinessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+      #     volumeMounts:
+      #       - name: storage-logs-pcs-bestellen
+      #         mountPath: /logs
+      # volumes:
+      #   - name: storage-logs-pcs-bestellen
+      #     persistentVolumeClaim:
+      #       claimName: storage-logs-pcs-bestellen
+
+      imagePullSecrets:
+        - name: **
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcs-bestellen
+  namespace: gazellig-prod
+spec:
+  selector:
+    name: pcs-bestellen
+  ports:
+    - protocol: TCP
+      port: 8080
+
+# --- 
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: storage-logs-pcs-bestellen
+#   namespace: gazellig-prod
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 256Mi

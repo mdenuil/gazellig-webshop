@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds-bestellingbeheer
+  namespace: gazellig-prod
+spec:
+  selector:
+    matchLabels:
+      name: ds-bestellingbeheer
+  template:
+    metadata:
+      labels:
+        name: ds-bestellingbeheer
+    spec:
+      containers:
+        - name: ds-bestellingbeheer
+          image: **/gazellig/microservice-ds-bestellingbeheer:master-1
+          env:
+          - name: RABBITMQ_HOST
+            value: rabbitmq
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_USERNAME
+            value: Kantilever
+          - name: RABBITMQ_PASSWORD
+            value: Kantilever
+          - name: KANTILEVER_EXCHANGE
+            value: Kantilver.Eventbus
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+          readinessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'wget -O - 0.0.0.0:8080/actuator/health | grep -qF "{\"status\":\"UP\"}"'
+      #     volumeMounts:
+      #       - name: storage-logs-ds-bestellingbeheer
+      #         mountPath: /logs
+      # volumes:
+      #   - name: storage-logs-ds-bestellingbeheer
+      #     persistentVolumeClaim:
+      #       claimName: storage-logs-ds-bestellingbeheer
+
+      imagePullSecrets:
+        - name: **
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-bestellingbeheer
+  namespace: gazellig-prod
+spec:
+  selector:
+    name: ds-bestellingbeheer
+  ports:
+    - protocol: TCP
+      port: 8080
+
+# --- 
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: storage-logs-ds-bestellingbeheer
+#   namespace: gazellig-prod
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 256Mi
